@@ -1,3 +1,3 @@
 # Wordle Peaks Shepherd
 
-A tool to be your Mountain Guide to [🏔️ Wordle Peaks](https://vegeta897.github.io/wordle-peaks/) if you so desire.
+Your Mountain Guide to [🏔️ Wordle Peaks](https://vegeta897.github.io/wordle-peaks/) if you need the help. This is a fantastic Wordle spinoff created by [vegeta897](https://github.com/vegeta897/wordle-peaks).
