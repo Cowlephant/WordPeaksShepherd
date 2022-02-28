@@ -3,13 +3,13 @@ using Xunit;
 
 namespace WordlePeaksShepherd.Tests.Services;
 
-public sealed class WordlePeaksServiceTests
+public sealed class ShepherdServiceTests
 {
-	private WordlePeaksService service;
+	private ShepherdService service;
 
-	public WordlePeaksServiceTests()
+	public ShepherdServiceTests()
 	{
-		service = new WordlePeaksService();
+		service = new ShepherdService();
 	}
 
 	[Theory]
@@ -86,7 +86,7 @@ public sealed class WordlePeaksServiceTests
 		char invalidStartRange = 'a';
 		char validEndRange = 'z';
 
-		var exception = Assert.Throws<WordleException>(
+		var exception = Assert.Throws<ShepherdException>(
 			() => service.GetLetterScore(invalidLetter, invalidStartRange, validEndRange));
 		var expectedMessage = "Letter must be valid English character.";
 
@@ -100,7 +100,7 @@ public sealed class WordlePeaksServiceTests
 		char invalidStartRange = 'á';
 		char validEndRange = 'z';
 
-		var exception = Assert.Throws<WordleException>(
+		var exception = Assert.Throws<ShepherdException>(
 			() => service.GetLetterScore(validLetter, invalidStartRange, validEndRange));
 		var expectedMessage = "Range must consist of valid English letters.";
 

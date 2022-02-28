@@ -3,12 +3,12 @@ using System.Text;
 
 namespace WordlePeaksShepherd.Services;
 
-public sealed class WordlePeaksService
+public sealed class ShepherdService
 {
 	private string rawWords;
 	public IEnumerable<string> Words => rawWords.Split(' ');
 
-	public WordlePeaksService()
+	public ShepherdService()
 	{
 		InitializeWords();
 	}
@@ -31,12 +31,12 @@ public sealed class WordlePeaksService
 		var rangeIsInvalid = !IsValidLetter(inclusiveStart) || !IsValidLetter(inclusiveEnd);
 		if (rangeIsInvalid)
 		{
-			throw new WordleException("Range must consist of valid English letters.");
+			throw new ShepherdException("Range must consist of valid English letters.");
 		}
 		var letterIsInvalid = !IsValidLetter(lowerLetter);
 		if (letterIsInvalid)
 		{
-			throw new WordleException("Letter must be valid English character.");
+			throw new ShepherdException("Letter must be valid English character.");
 		}
 
 		var characterRange = GenerateCharactersInRange(inclusiveStart, inclusiveEnd);
@@ -81,4 +81,6 @@ public sealed class WordlePeaksService
 
 		return characterStringBuilder.ToString();
 	}
+
+	public IEnumerable<string> GetWordChoices(Shepherd)
 }
