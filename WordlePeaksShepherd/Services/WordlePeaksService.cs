@@ -36,7 +36,7 @@ public sealed class WordlePeaksService
 		var letterIsInvalid = !IsValidLetter(lowerLetter);
 		if (letterIsInvalid)
 		{
-			throw new WordleException("Character must be valid English letter.");
+			throw new WordleException("Letter must be valid English character.");
 		}
 
 		var characterRange = GenerateCharactersInRange(inclusiveStart, inclusiveEnd);

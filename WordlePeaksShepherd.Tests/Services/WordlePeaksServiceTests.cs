@@ -78,4 +78,32 @@ public sealed class WordlePeaksServiceTests
 
 		Assert.Equal(expectedScore, letterScore);
 	}
+
+	[Fact]
+	public void GetLetterScore_ShouldThrowExceptionGivenInvalidLetter()
+	{
+		char invalidLetter = '5';
+		char invalidStartRange = 'a';
+		char validEndRange = 'z';
+
+		var exception = Assert.Throws<WordleException>(
+			() => service.GetLetterScore(invalidLetter, invalidStartRange, validEndRange));
+		var expectedMessage = "Letter must be valid English character.";
+
+		Assert.Equal(expectedMessage, exception.Message);
+	}
+
+	[Fact]
+	public void GetLetterScore_ShouldThrowExceptionGivenInvalidRange()
+	{
+		char validLetter = 'm';
+		char invalidStartRange = 'á';
+		char validEndRange = 'z';
+
+		var exception = Assert.Throws<WordleException>(
+			() => service.GetLetterScore(validLetter, invalidStartRange, validEndRange));
+		var expectedMessage = "Range must consist of valid English letters.";
+
+		Assert.Equal(expectedMessage, exception.Message);
+	}
 }
