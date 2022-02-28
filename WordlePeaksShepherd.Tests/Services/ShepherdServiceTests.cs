@@ -1,67 +1,33 @@
-﻿using WordlePeaksShepherd.Services;
+﻿using Microsoft.Extensions.DependencyInjection;
+using WordlePeaksShepherd.Services;
 using Xunit;
 
 namespace WordlePeaksShepherd.Tests.Services;
 
-public sealed class ShepherdServiceTests
+public sealed class ShepherdServiceTests : IClassFixture<ContainerFixture>
 {
 	private ShepherdService service;
 
-	public ShepherdServiceTests()
+	public ShepherdServiceTests(ContainerFixture fixture)
 	{
-		service = new ShepherdService();
-	}
-
-	[Theory]
-	[InlineData('a')]
-	[InlineData('A')]
-	[InlineData('z')]
-	[InlineData('Z')]
-	public void IsValidLetter_ShouldReturnTrueForValidEnglishLetters(char letter)
-	{
-		var isValidLetter = service.IsValidLetter(letter);
-
-		Assert.True(isValidLetter);
-	}
-
-	[Theory]
-	[InlineData('0')]
-	[InlineData('9')]
-	[InlineData('!')]
-	[InlineData(' ')]
-	[InlineData('\t')]
-	[InlineData('á')]
-	[InlineData('é')]
-	[InlineData('ᴃ')]
-	[InlineData('ꜰ')]
-	public void IsValidLetter_ShouldReturnFalseForNonEnglishLetters(char letter)
-	{
-		var isValidLetter = service.IsValidLetter(letter);
-
-		Assert.False(isValidLetter);
-	}
-
-	[Theory]
-	[InlineData('a', 'z', "abcdefghijklmnopqrstuvwxyz")]
-	[InlineData('c', 'p', "cdefghijklmnop")]
-	public void GenerateCharactersInRange_ShouldReturnExpectedRangeGivenValidValues(
-		char startRange, char endRange, string expectedCharacters)
-	{
-		var characterRange = service.GenerateCharactersInRange(startRange, endRange);
-
-		Assert.Equal(expectedCharacters, characterRange);
+		var wordService = fixture.ServiceProvider.GetService<IWordService>()!;
+		var letterService = fixture.ServiceProvider.GetService<ILetterService>()!;
+		service = new ShepherdService(wordService, letterService);
 	}
 
 	[Fact]
-	public void GenerateCharactersInRange_ShouldReturnExpectedRangeWithValidValuesOutOfOrder()
+	public void Words_ShouldReturnAllExpectedWords()
 	{
-		char startRange = 'z';
-		char endRange = 'a';
-		var expectedCharacters = "abcdefghijklmnopqrstuvwxyz";
+		var expectedWords = new List<string> {
+			"hello", "quite", "right", "sadly", "about",
+			"three", "weeks", "makes", "basic", "tasks",
+			"quite", "tough", "never", "smart", "enjoy",
+			"other", "games", "learn", "extra", "words",
+			"heard", "worse", "ideas", "great", "adieu" };
 
-		var characterRange = service.GenerateCharactersInRange(startRange, endRange);
+		var words = service.Words;
 
-		Assert.Equal(expectedCharacters, characterRange);
+		Assert.Equal(expectedWords, words);
 	}
 
 	[Theory]

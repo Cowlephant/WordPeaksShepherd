@@ -1,45 +1,46 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using System.Text;
 
 namespace WordlePeaksShepherd.Services;
 
-public sealed class ShepherdService
+public sealed class ShepherdService : IShepherdService
 {
-	private string rawWords;
-	public IEnumerable<string> Words => rawWords.Split(' ');
+	private IWordService wordService;
+	private ILetterService letterService;
 
-	public ShepherdService()
+	private string rawWords;
+	public IEnumerable<string> Words => wordService.GetPotentialAnswerWords();
+
+	public ShepherdService(IWordService wordService, ILetterService letterService)
 	{
+		this.wordService = wordService;
+		this.letterService = letterService;
 		InitializeWords();
 	}
 
 	[MemberNotNull(nameof(rawWords))]
 	private void InitializeWords()
 	{
-		var wordsResourceStream = typeof(Program).Assembly.GetManifestResourceStream(
-			"WordlePeaksShepherd.Data.words-potential.txt")!;
-		using var fileReader = new StreamReader(wordsResourceStream);
-		rawWords = fileReader.ReadToEnd()
-			.ReplaceLineEndings("\n");
-		fileReader.Close();
+		rawWords = string.Join(" ", wordService.GetPotentialAnswerWords());
 	}
 
 	public int GetLetterScore(char letter, char inclusiveStart, char inclusiveEnd)
 	{
 		var lowerLetter = Char.ToLower(letter);
 
-		var rangeIsInvalid = !IsValidLetter(inclusiveStart) || !IsValidLetter(inclusiveEnd);
+		var rangeIsInvalid =
+			!letterService.IsValidLetter(inclusiveStart) ||
+			!letterService.IsValidLetter(inclusiveEnd);
 		if (rangeIsInvalid)
 		{
 			throw new ShepherdException("Range must consist of valid English letters.");
 		}
-		var letterIsInvalid = !IsValidLetter(lowerLetter);
+		var letterIsInvalid = !letterService.IsValidLetter(lowerLetter);
 		if (letterIsInvalid)
 		{
 			throw new ShepherdException("Letter must be valid English character.");
 		}
 
-		var characterRange = GenerateCharactersInRange(inclusiveStart, inclusiveEnd);
+		var characterRange = letterService.GenerateLettersInRange(inclusiveStart, inclusiveEnd);
 		int letterIndex = characterRange.IndexOf(lowerLetter);
 
 		int lettersRemoveFromLeft = letterIndex;
@@ -50,37 +51,8 @@ public sealed class ShepherdService
 		return letterScore;
 	}
 
-	public bool IsValidLetter(char letter)
+	public IEnumerable<string> GetWordChoices(ShepherdWordCriteria wordCriteria)
 	{
-		var lowerLetter = Char.ToLower(letter);
-		var isValid = lowerLetter >= 'a' && lowerLetter <= 'z';
-		return isValid;
+		throw new NotImplementedException();
 	}
-
-	public string GenerateCharactersInRange(char inclusiveStart, char inclusiveEnd)
-	{
-		var lowerStart = Char.ToLower(inclusiveStart);
-		var lowerEnd = Char.ToLower(inclusiveEnd);
-
-		var valuesOutOfOrder = (int)lowerEnd < (int)lowerStart;
-		if (valuesOutOfOrder)
-		{
-			(lowerStart, lowerEnd) = (lowerEnd, lowerStart);
-		}
-
-		var rangeStart = (int)lowerStart;
-		var rangeCount = ((int)lowerEnd) - rangeStart + 1;
-		var indexRange = Enumerable.Range(rangeStart, rangeCount);
-
-		var characterStringBuilder = new StringBuilder(indexRange.Count());
-
-		foreach (var characterIndex in indexRange)
-		{
-			characterStringBuilder.Append((char)characterIndex);
-		}
-
-		return characterStringBuilder.ToString();
-	}
-
-	public IEnumerable<string> GetWordChoices(Shepherd)
 }
