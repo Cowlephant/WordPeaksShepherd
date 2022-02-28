@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32112.339
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WordlePeaksShepherd", "WordlePeaksShepherd\WordlePeaksShepherd.csproj", "{F6A5BA99-FD50-480B-98B7-85A4785F365D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WordlePeaksShepherd.Tests", "WordlePeaksShepherd.Tests\WordlePeaksShepherd.Tests.csproj", "{D2BB0D18-714D-41F8-A447-C82A92F4C1AE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F6A5BA99-FD50-480B-98B7-85A4785F365D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6A5BA99-FD50-480B-98B7-85A4785F365D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6A5BA99-FD50-480B-98B7-85A4785F365D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6A5BA99-FD50-480B-98B7-85A4785F365D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D2BB0D18-714D-41F8-A447-C82A92F4C1AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2BB0D18-714D-41F8-A447-C82A92F4C1AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2BB0D18-714D-41F8-A447-C82A92F4C1AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2BB0D18-714D-41F8-A447-C82A92F4C1AE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {85994312-ADF0-49E4-95D6-6D2A7C804A9D}
+	EndGlobalSection
+EndGlobal
