@@ -22,12 +22,6 @@ public sealed class LetterService : ILetterService
 		var lowerStart = Char.ToLower(letterRange.StartRange);
 		var lowerEnd = Char.ToLower(letterRange.EndRange);
 
-		var valuesOutOfOrder = (int)lowerEnd < (int)lowerStart;
-		if (valuesOutOfOrder)
-		{
-			(lowerStart, lowerEnd) = (lowerEnd, lowerStart);
-		}
-
 		var rangeStart = (int)lowerStart;
 		var rangeCount = ((int)lowerEnd) - rangeStart + 1;
 		var indexRange = Enumerable.Range(rangeStart, rangeCount);
