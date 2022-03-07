@@ -18,12 +18,15 @@ public sealed class ShepherdService : IShepherdService
 	private LetterRanges letterRanges;
 	public LetterRanges LetterRanges => letterRanges;
 
+	private List<LetterRanges> previousLetterRanges;
+
 	public ShepherdService(LetterRanges letterRanges, IWordService wordService, ILetterService letterService)
 	{
 		this.wordService = wordService;
 		this.letterService = letterService;
 
 		this.letterRanges = letterRanges;
+		previousLetterRanges = new List<LetterRanges>();
 		chosenWords = new List<WordCriteria>();
 
 		InitializeWords();
@@ -39,7 +42,29 @@ public sealed class ShepherdService : IShepherdService
 	{
 		chosenWords.Add(wordCriteria);
 
-		letterService.GetWordScore(wordCriteria.LetterCriteria);
+		var firstLetterRange = NarrowLetterRange(wordCriteria.LetterCriteria[0].LetterRange, letterRanges.First);
+		var secondLetterRange = NarrowLetterRange(wordCriteria.LetterCriteria[1].LetterRange, letterRanges.Second);
+		var thirdLetterRange = NarrowLetterRange(wordCriteria.LetterCriteria[2].LetterRange, letterRanges.Third);
+		var fourthLetterRange = NarrowLetterRange(wordCriteria.LetterCriteria[3].LetterRange, letterRanges.Fourth);
+		var fifthLetterRange = NarrowLetterRange(wordCriteria.LetterCriteria[4].LetterRange, letterRanges.Fifth);
+
+		previousLetterRanges.Add(letterRanges);
+		letterRanges = new LetterRanges(
+			firstLetterRange,
+			secondLetterRange,
+			thirdLetterRange,
+			fourthLetterRange,
+			fifthLetterRange);
+	}
+
+	private LetterRange NarrowLetterRange(LetterRange newLetterRange, LetterRange existingLetterRange)
+	{
+		var startRange = newLetterRange.StartRange > existingLetterRange.StartRange ? 
+			newLetterRange.StartRange : existingLetterRange.StartRange;
+		var endRange = newLetterRange.EndRange < existingLetterRange.EndRange ?
+			newLetterRange.EndRange : existingLetterRange.EndRange;
+
+		return new LetterRange(startRange, endRange);
 	}
 
 	public IEnumerable<Word> GetSuggestedWords()
@@ -71,7 +96,7 @@ public sealed class ShepherdService : IShepherdService
 		return matches;
 	}
 
-	public void UndoLastWordChoice()
+	public void UndoWordChoice()
 	{
 		if(chosenWords.Count == 0)
 		{
@@ -79,11 +104,14 @@ public sealed class ShepherdService : IShepherdService
 		}
 
 		chosenWords.RemoveAt(chosenWords.Count - 1);
+		letterRanges = previousLetterRanges.Last();
+		previousLetterRanges.RemoveAt(previousLetterRanges.Count - 1);
 	}
 
 	public void Reset()
 	{
 		chosenWords = new List<WordCriteria>();
 		letterRanges = LetterRanges.Default;
+		previousLetterRanges = new List<LetterRanges>();
 	}
 }

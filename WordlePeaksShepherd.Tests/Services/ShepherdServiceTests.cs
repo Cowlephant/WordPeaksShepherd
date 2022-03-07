@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using FluentAssertions;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using System.Collections;
 using WordlePeaksShepherd.Services;
@@ -41,6 +42,121 @@ public sealed class ShepherdServiceTests : IClassFixture<ContainerFixture>
 		var words = service.GetSuggestedWords().Select(w => w.Value);
 
 		Assert.Equal(expectedWords, words);
+	}
+
+	[Fact]
+	public void AddWordChoice_ShouldAddChosenWordAndUpdateLetterRanges()
+	{
+		// Arrange
+		var service = new ShepherdService(LetterRanges.Default, wordService, letterService);
+		var firstWordChoice = new WordCriteria(
+			new List<LetterCriteria>
+			{
+						new LetterCriteria('a', LetterStatus.Unknown, new LetterRange('a', 's')),
+						new LetterCriteria('p', LetterStatus.Unknown, new LetterRange('g', 't')),
+						new LetterCriteria('p', LetterStatus.Unknown, new LetterRange('g', 't')),
+						new LetterCriteria('l', LetterStatus.Unknown, new LetterRange('f', 'o')),
+						new LetterCriteria('e', LetterStatus.Unknown, new LetterRange('a', 'j'))
+			});
+		var secondWordChoice = new WordCriteria(
+			new List<LetterCriteria>
+			{
+						new LetterCriteria('f', LetterStatus.Unknown, new LetterRange('g', 'n')),
+						new LetterCriteria('a', LetterStatus.Unknown, new LetterRange('i', 'o')),
+						new LetterCriteria('k', LetterStatus.Unknown, new LetterRange('i', 'o')),
+						new LetterCriteria('e', LetterStatus.Unknown, new LetterRange('l', 'm')),
+						new LetterCriteria('r', LetterStatus.Unknown, new LetterRange('f', 'i'))
+			});
+		var expectedChosenWords = new List<WordCriteria> { firstWordChoice, secondWordChoice };
+		var expectedLetterRanges = new LetterRanges(
+			new LetterRange('g', 'n'),
+			new LetterRange('i', 'o'),
+			new LetterRange('i', 'o'),
+			new LetterRange('l', 'm'),
+			new LetterRange('f', 'i'));
+
+		service.AddWordChoice(firstWordChoice);
+		service.AddWordChoice(secondWordChoice);
+
+		Assert.Equal(expectedChosenWords, service.ChosenWords);
+		service.LetterRanges.Should().BeEquivalentTo(expectedLetterRanges);
+	}
+
+	[Fact]
+	public void UndoWordChoice_ShouldRemoveLastAddedChosenWordAndRestorePreviousLetterRanges()
+	{
+		// Arrange
+		var service = new ShepherdService(LetterRanges.Default, wordService, letterService);
+		var firstWordCriteria = new WordCriteria(
+			new List<LetterCriteria>
+			{
+						new LetterCriteria('a', LetterStatus.Unknown, new LetterRange('a', 's')),
+						new LetterCriteria('p', LetterStatus.Unknown, new LetterRange('g', 't')),
+						new LetterCriteria('p', LetterStatus.Unknown, new LetterRange('g', 't')),
+						new LetterCriteria('l', LetterStatus.Unknown, new LetterRange('f', 'o')),
+						new LetterCriteria('e', LetterStatus.Unknown, new LetterRange('a', 'j'))
+			});
+		var secondWordCriteria = new WordCriteria(
+			new List<LetterCriteria>
+			{
+						new LetterCriteria('s', LetterStatus.Unknown, new LetterRange('g', 'm')),
+						new LetterCriteria('e', LetterStatus.Unknown, new LetterRange('g', 'm')),
+						new LetterCriteria('e', LetterStatus.Unknown, new LetterRange('g', 'm')),
+						new LetterCriteria('d', LetterStatus.Unknown, new LetterRange('g', 'm')),
+						new LetterCriteria('s', LetterStatus.Unknown, new LetterRange('g', 'm'))
+			});
+		service.AddWordChoice(firstWordCriteria);
+		service.AddWordChoice(secondWordCriteria);
+		var expectedChosenWords = new List<WordCriteria> { firstWordCriteria };
+		var expectedLetterRanges = new LetterRanges(
+			new LetterRange('a', 's'),
+			new LetterRange('g', 't'),
+			new LetterRange('g', 't'),
+			new LetterRange('f', 'o'),
+			new LetterRange('a', 'j'));
+
+		// Act
+		service.UndoWordChoice();
+
+		Assert.Equal(expectedChosenWords, service.ChosenWords);
+		service.LetterRanges.Should().BeEquivalentTo(expectedLetterRanges);
+	}
+
+	[Fact]
+	public void UndoLastWordChoice_ShouldDoNothingWhenNoChosenWordsExist()
+	{
+		var service = new ShepherdService(LetterRanges.Default, wordService, letterService);
+		var expectedChosenWords = new List<WordCriteria>();
+		var expectedLetterRanges = LetterRanges.Default;
+
+		service.UndoWordChoice();
+
+		Assert.Equal(expectedChosenWords, service.ChosenWords);
+		Assert.Equal(expectedLetterRanges, service.LetterRanges);
+	}
+
+	[Fact]
+	public void Reset_ShouldResetChosenWordsAndLetterRanges()
+	{
+		var service = new ShepherdService(LetterRanges.Default, wordService, letterService);
+		var newWordCriteria = new WordCriteria(
+			new List<LetterCriteria>
+			{
+				new LetterCriteria('a', LetterStatus.Higher, new LetterRange('a', 'z')),
+				new LetterCriteria('p', LetterStatus.Higher, new LetterRange('a', 'z')),
+				new LetterCriteria('p', LetterStatus.Higher, new LetterRange('a', 'z')),
+				new LetterCriteria('l', LetterStatus.Higher, new LetterRange('a', 'z')),
+				new LetterCriteria('e', LetterStatus.Higher, new LetterRange('a', 'z'))
+			});
+		service.AddWordChoice(newWordCriteria);
+
+		var expectedChosenWords = new List<WordCriteria>();
+		var expectedLetterRanges = LetterRanges.Default;
+
+		service.Reset();
+
+		Assert.Equal(expectedChosenWords, service.ChosenWords);
+		Assert.Equal(expectedLetterRanges, service.LetterRanges);
 	}
 
 	[Theory, ClassData(typeof(LetterRangesExpectedWordsWithScores))]
