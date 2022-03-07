@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 using WordlePeaksShepherd.Services.Interfaces;
 
 namespace WordlePeaksShepherd.Services;
@@ -17,33 +18,44 @@ public sealed class ShepherdService : IShepherdService
 	private LetterRanges letterRanges;
 	public LetterRanges LetterRanges => letterRanges;
 
-	public ShepherdService(IWordService wordService, ILetterService letterService)
+	public ShepherdService(LetterRanges letterRanges, IWordService wordService, ILetterService letterService)
 	{
 		this.wordService = wordService;
 		this.letterService = letterService;
 
+		this.letterRanges = letterRanges;
+		chosenWords = new List<WordCriteria>();
+
 		InitializeWords();
-		Reset();
 	}
 
 	[MemberNotNull(nameof(rawWords))]
 	private void InitializeWords()
 	{
-		rawWords = string.Join(" ", wordService.GetPotentialAnswerWords());
+		rawWords = string.Join("\n", wordService.GetPotentialAnswerWords());
 	}
 
-	public IEnumerable<Word> AddWordChoice(WordCriteria wordCriteria)
+	public void AddWordChoice(WordCriteria wordCriteria)
 	{
 		chosenWords.Add(wordCriteria);
 
 		letterService.GetWordScore(wordCriteria.LetterCriteria);
-
-		return GetSuggestedWords();
 	}
 
-	public IEnumerable<Word> GetSuggestedWords()
+	public IEnumerable<string> GetSuggestedWords()
 	{
-		throw new NotImplementedException();
+		var firstPattern = $"[{letterRanges.First.StartRange}-{letterRanges.First.EndRange}]?";
+		var secondPattern = $"[{letterRanges.Second.StartRange}-{letterRanges.Second.EndRange}]?";
+		var thirdPattern = $"[{letterRanges.Third.StartRange}-{letterRanges.Third.EndRange}]?";
+		var fourthPattern = $"[{letterRanges.Fourth.StartRange}-{letterRanges.Fourth.EndRange}]?";
+		var fifthPattern = $"[{letterRanges.Fifth.StartRange}-{letterRanges.Fifth.EndRange}]?";
+		var wordPattern = $@"^(?=.{{5}}){firstPattern}{secondPattern}{thirdPattern}{fourthPattern}{fifthPattern}$";
+
+		var regex = new Regex(wordPattern, RegexOptions.IgnoreCase | RegexOptions.Multiline);
+
+		var matches = regex.Matches(rawWords).Select(x => x.Value);
+
+		return matches;
 	}
 
 	public void UndoLastWordChoice()
@@ -56,8 +68,6 @@ public sealed class ShepherdService : IShepherdService
 		chosenWords.RemoveAt(chosenWords.Count - 1);
 	}
 
-	[MemberNotNull(nameof(chosenWords))]
-	[MemberNotNull(nameof(letterRanges))]
 	public void Reset()
 	{
 		chosenWords = new List<WordCriteria>();

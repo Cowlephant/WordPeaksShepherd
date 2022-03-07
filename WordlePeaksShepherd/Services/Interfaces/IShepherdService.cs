@@ -7,7 +7,7 @@ public interface IShepherdService
 
 	public void UndoLastWordChoice();
 	public void Reset();
-	public IEnumerable<Word> AddWordChoice(WordCriteria wordCriteria);
+	public void AddWordChoice(WordCriteria wordCriteria);
 
-	public IEnumerable<Word> GetSuggestedWords();
+	public IEnumerable<string> GetSuggestedWords();
 }
