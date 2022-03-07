@@ -1,10 +1,12 @@
-﻿namespace WordlePeaksShepherd.Services;
+﻿using WordlePeaksShepherd.Services.Interfaces;
 
-public sealed class WordlePeaksWordService : IWordService
+namespace WordlePeaksShepherd.Services;
+
+public sealed class WordService : IWordService
 {
 	private List<string> words;
 
-	public WordlePeaksWordService(Stream wordFileStream)
+	public WordService(Stream wordFileStream)
 	{
 		using var fileReader = new StreamReader(wordFileStream);
 		var rawWords = fileReader.ReadToEnd()

@@ -1,4 +1,4 @@
-﻿namespace WordlePeaksShepherd.Services;
+﻿namespace WordlePeaksShepherd.Services.Interfaces;
 
 public interface IWordService
 {

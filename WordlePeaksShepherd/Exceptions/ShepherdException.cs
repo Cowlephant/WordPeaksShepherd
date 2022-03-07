@@ -1,4 +1,4 @@
-﻿namespace WordlePeaksShepherd.Services;
+﻿namespace WordlePeaksShepherd.Exceptions;
 
 public sealed class ShepherdException : Exception
 {

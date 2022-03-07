@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using WordlePeaksShepherd.Services;
+using WordlePeaksShepherd.Services.Interfaces;
 
 namespace WordlePeaksShepherd.Tests;
 
@@ -10,18 +11,18 @@ public sealed class ContainerFixture
 
 	public ContainerFixture()
 	{
-		var serviceCollection = new ServiceCollection();
-		serviceCollection.AddTransient<IWordService, WordlePeaksWordService>(
+		var services = new ServiceCollection();
+		services.AddTransient<IWordService, WordService>(
 			serviceProvider =>
 			{
 				using var testWordsFile = new StreamReader(@"Data\test-potential-words.txt");
 
-				return new WordlePeaksWordService(testWordsFile.BaseStream);
+				return new WordService(testWordsFile.BaseStream);
 			});
-		serviceCollection.AddTransient<ILetterService, ShepherdLetterService>();
-		serviceCollection.AddTransient<IShepherdService, ShepherdService>();
+		services.AddTransient<ILetterService, LetterService>();
+		services.AddTransient<IShepherdService, ShepherdService>();
 
-		ServiceProvider = serviceCollection.BuildServiceProvider();
+		ServiceProvider = services.BuildServiceProvider();
 	}
 }
 //ncrunch: no coverage end

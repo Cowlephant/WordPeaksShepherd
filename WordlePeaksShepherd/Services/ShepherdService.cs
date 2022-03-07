@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using WordlePeaksShepherd.Services.Interfaces;
 
 namespace WordlePeaksShepherd.Services;
 
@@ -10,11 +11,19 @@ public sealed class ShepherdService : IShepherdService
 	private string rawWords;
 	public IEnumerable<string> Words => wordService.GetPotentialAnswerWords();
 
+	private List<WordCriteria> chosenWords;
+	public IEnumerable<WordCriteria> ChosenWords => chosenWords.AsReadOnly();
+
+	private LetterRanges letterRanges;
+	public LetterRanges LetterRanges => letterRanges;
+
 	public ShepherdService(IWordService wordService, ILetterService letterService)
 	{
 		this.wordService = wordService;
 		this.letterService = letterService;
+
 		InitializeWords();
+		Reset();
 	}
 
 	[MemberNotNull(nameof(rawWords))]
@@ -23,36 +32,35 @@ public sealed class ShepherdService : IShepherdService
 		rawWords = string.Join(" ", wordService.GetPotentialAnswerWords());
 	}
 
-	public int GetLetterScore(char letter, char inclusiveStart, char inclusiveEnd)
+	public IEnumerable<Word> AddWordChoice(WordCriteria wordCriteria)
 	{
-		var lowerLetter = Char.ToLower(letter);
+		chosenWords.Add(wordCriteria);
 
-		var rangeIsInvalid =
-			!letterService.IsValidLetter(inclusiveStart) ||
-			!letterService.IsValidLetter(inclusiveEnd);
-		if (rangeIsInvalid)
-		{
-			throw new ShepherdException("Range must consist of valid English letters.");
-		}
-		var letterIsInvalid = !letterService.IsValidLetter(lowerLetter);
-		if (letterIsInvalid)
-		{
-			throw new ShepherdException("Letter must be valid English character.");
-		}
+		letterService.GetWordScore(wordCriteria.LetterCriteria);
 
-		var characterRange = letterService.GenerateLettersInRange(inclusiveStart, inclusiveEnd);
-		int letterIndex = characterRange.IndexOf(lowerLetter);
-
-		int lettersRemoveFromLeft = letterIndex;
-		int lettersRemovedFromRight = (characterRange.Length - 1) - letterIndex;
-
-		var letterScore = Math.Abs(lettersRemoveFromLeft - lettersRemovedFromRight);
-
-		return letterScore;
+		return GetSuggestedWords();
 	}
 
-	public IEnumerable<string> GetWordChoices(ShepherdWordCriteria wordCriteria)
+	public IEnumerable<Word> GetSuggestedWords()
 	{
 		throw new NotImplementedException();
+	}
+
+	public void UndoLastWordChoice()
+	{
+		if(chosenWords.Count == 0)
+		{
+			return;
+		}
+
+		chosenWords.RemoveAt(chosenWords.Count - 1);
+	}
+
+	[MemberNotNull(nameof(chosenWords))]
+	[MemberNotNull(nameof(letterRanges))]
+	public void Reset()
+	{
+		chosenWords = new List<WordCriteria>();
+		letterRanges = LetterRanges.Default;
 	}
 }
