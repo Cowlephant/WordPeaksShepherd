@@ -1,6 +1,7 @@
 ﻿// source: https://github.com/jhewlett/ValueObject
 using System.Reflection;
 
+//ncrunch: no coverage start
 public abstract class ValueObject : IEquatable<ValueObject>
 {
 	private List<PropertyInfo>? properties;
@@ -105,3 +106,4 @@ public abstract class ValueObject : IEquatable<ValueObject>
 		return seed * 23 + currentHash;
 	}
 }
+//ncrunch: no coverage end

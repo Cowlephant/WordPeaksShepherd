@@ -2,6 +2,7 @@
 
 namespace WordlePeaksShepherd.Services;
 
+//ncrunch: no coverage start
 public sealed class LetterStatus : SmartEnum<LetterStatus>
 {
 	public static LetterStatus Unknown = new LetterStatus("Unknown", 1);
@@ -14,3 +15,4 @@ public sealed class LetterStatus : SmartEnum<LetterStatus>
 	{
 	}
 }
+//ncrunch: no coverage end
