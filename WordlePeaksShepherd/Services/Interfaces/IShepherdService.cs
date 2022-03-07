@@ -9,5 +9,5 @@ public interface IShepherdService
 	public void Reset();
 	public void AddWordChoice(WordCriteria wordCriteria);
 
-	public IEnumerable<string> GetSuggestedWords();
+	public IEnumerable<Word> GetSuggestedWords();
 }

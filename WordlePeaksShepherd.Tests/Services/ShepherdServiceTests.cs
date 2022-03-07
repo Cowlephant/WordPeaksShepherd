@@ -37,14 +37,15 @@ public sealed class ShepherdServiceTests : IClassFixture<ContainerFixture>
 		var service = new ShepherdService(LetterRanges.Default, wordService, letterService);
 		var expectedWords = File.ReadAllText("Data/test-potential-words.txt").Split("\r\n");
 
-		var words = service.GetSuggestedWords();
+		// We're going to ignore the scores
+		var words = service.GetSuggestedWords().Select(w => w.Value);
 
 		Assert.Equal(expectedWords, words);
 	}
 
-	[Theory, ClassData(typeof(LetterRangesExpectedWords))]
-	public void GetSuggestedWords_ShouldReturnExpectedWordsGivenLetterRanges(
-		LetterRanges letterRanges, IEnumerable<string> expectedWords)
+	[Theory, ClassData(typeof(LetterRangesExpectedWordsWithScores))]
+	public void GetSuggestedWords_ShouldReturnExpectedWordsWithScoresGivenLetterRanges(
+		LetterRanges letterRanges, IEnumerable<Word> expectedWords)
 	{
 		var service = new ShepherdService(letterRanges, wordService, letterService);
 
@@ -53,7 +54,7 @@ public sealed class ShepherdServiceTests : IClassFixture<ContainerFixture>
 		Assert.Equal(expectedWords, words);
 	}
 
-	public class LetterRangesExpectedWords : IEnumerable<object[]>
+	public class LetterRangesExpectedWordsWithScores : IEnumerable<object[]>
 	{
 		private readonly List<object[]> data = new List<object[]>
 		{
@@ -65,7 +66,12 @@ public sealed class ShepherdServiceTests : IClassFixture<ContainerFixture>
 					new LetterRange('f', 'r'),
 					new LetterRange('f', 'r'),
 					new LetterRange('f', 'r')),
-				new string[] { "hippo", "igloo", "grill" }
+				new Word[]
+				{
+					new Word("hippo", 36),
+					new Word("igloo", 28),
+					new Word("grill", 28)
+				}
 			},
 			new object[]
 			{
@@ -75,14 +81,40 @@ public sealed class ShepherdServiceTests : IClassFixture<ContainerFixture>
 					new LetterRange('d', 't'),
 					new LetterRange('d', 't'),
 					new LetterRange('d', 't')),
-				new string[] {
-					"skill", "shirt", "timer", "hippo", "igloo",
-					"slide", "stole", "spoon", "melon", "phone",
-					"rigid", "grill", "steel", "their",	"trend", 
-					"depth", "kneel", "loose", "snide", "tress", 
-					"fight", "spite", "trope", "intro", "retro", 
-					"spine", "piper", "smoke", "ridge", "oriel", 
-					"spore", "shore", "ditto"
+				new Word[] {
+					new Word("skill", 22), 
+					new Word("shirt", 56), 
+					new Word("timer", 50), 
+					new Word("hippo", 36),
+					new Word("igloo", 28),
+					new Word("slide", 50),
+					new Word("stole", 50),
+					new Word("spoon", 38),
+					new Word("melon", 26),
+					new Word("phone", 40),
+					new Word("rigid", 50),
+					new Word("grill", 28),
+					new Word("steel", 58),
+					new Word("their", 56),
+					new Word("trend", 62),
+					new Word("depth", 62),
+					new Word("kneel", 34),
+					new Word("loose", 40),
+					new Word("snide", 54),
+					new Word("tress", 70),
+					new Word("fight", 52),
+					new Word("spite", 58),
+					new Word("trope", 56),
+					new Word("intro", 44),
+					new Word("retro", 60),
+					new Word("spine", 46),
+					new Word("piper", 48),
+					new Word("smoke", 38),
+					new Word("ridge", 58),
+					new Word("oriel", 38),
+					new Word("spore", 54),
+					new Word("shore", 54),
+					new Word("ditto", 60)
 				}
 			},
 			new object[]
@@ -93,7 +125,13 @@ public sealed class ShepherdServiceTests : IClassFixture<ContainerFixture>
 					new LetterRange('g', 'l'),
 					new LetterRange('d', 'z'),
 					new LetterRange('f', 't')),
-				new string[] { "igloo", "melon", "grill", "fight" }
+				new Word[]
+				{
+					new Word("igloo", 21),
+					new Word("melon", 31),
+					new Word("grill", 23),
+					new Word("fight", 45)
+				}
 			},
 			new object[]
 			{
@@ -103,7 +141,13 @@ public sealed class ShepherdServiceTests : IClassFixture<ContainerFixture>
 					new LetterRange('a', 'm'),
 					new LetterRange('a', 'm'),
 					new LetterRange('a', 'm')),
-				new string[] { "decal", "bleed", "magic", "medic" }
+				new Word[]
+				{
+					new Word("decal", 40),
+					new Word("bleed", 34),
+					new Word("magic", 36),
+					new Word("medic", 34)
+				}
 			},
 						new object[]
 			{
@@ -113,7 +157,15 @@ public sealed class ShepherdServiceTests : IClassFixture<ContainerFixture>
 					new LetterRange('m', 'z'),
 					new LetterRange('m', 'z'),
 					new LetterRange('m', 'z')),
-				new string[] { "rusty", "sunny", "spoon", "roomy", "worst", "mourn" }
+				new Word[]
+				{
+					new Word("rusty", 19),
+					new Word("sunny", 37),
+					new Word("spoon", 37),
+					new Word("roomy", 45),
+					new Word("worst", 21),
+					new Word("mourn", 39)
+				}
 			},
 			new object[]
 			{
@@ -123,7 +175,7 @@ public sealed class ShepherdServiceTests : IClassFixture<ContainerFixture>
 					new LetterRange('a', 'g'),
 					new LetterRange('a', 'g'),
 					new LetterRange('a', 'g')),
-				new string[] { }
+				new Word[] { }
 			}
 		};
 

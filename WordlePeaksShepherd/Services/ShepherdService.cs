@@ -42,7 +42,7 @@ public sealed class ShepherdService : IShepherdService
 		letterService.GetWordScore(wordCriteria.LetterCriteria);
 	}
 
-	public IEnumerable<string> GetSuggestedWords()
+	public IEnumerable<Word> GetSuggestedWords()
 	{
 		var firstPattern = $"[{letterRanges.First.StartRange}-{letterRanges.First.EndRange}]?";
 		var secondPattern = $"[{letterRanges.Second.StartRange}-{letterRanges.Second.EndRange}]?";
@@ -53,7 +53,20 @@ public sealed class ShepherdService : IShepherdService
 
 		var regex = new Regex(wordPattern, RegexOptions.IgnoreCase | RegexOptions.Multiline);
 
-		var matches = regex.Matches(rawWords).Select(x => x.Value);
+		var matches = regex.Matches(rawWords)
+			.Select(x => 
+			{
+				var letterCriteria = new List<LetterCriteria>
+				{
+					new LetterCriteria(x.Value[0], LetterStatus.Unknown, LetterRanges.First),
+					new LetterCriteria(x.Value[1], LetterStatus.Unknown, LetterRanges.Second),
+					new LetterCriteria(x.Value[2], LetterStatus.Unknown, LetterRanges.Third),
+					new LetterCriteria(x.Value[3], LetterStatus.Unknown, LetterRanges.Fourth),
+					new LetterCriteria(x.Value[4], LetterStatus.Unknown, LetterRanges.Fifth)
+				};
+
+				return new Word(x.Value, letterService.GetWordScore(letterCriteria));
+			});
 
 		return matches;
 	}
