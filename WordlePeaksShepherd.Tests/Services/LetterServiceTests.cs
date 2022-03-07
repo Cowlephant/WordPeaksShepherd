@@ -119,6 +119,7 @@ public sealed class LetterServiceTests
 		Assert.Equal(expectedScore, score);
 	}
 
+	//ncrunch: no coverage start
 	public class SampleWordCriteriaData : IEnumerable<object[]>
 	{
 		private readonly List<object[]> data = new List<object[]>
@@ -201,4 +202,5 @@ public sealed class LetterServiceTests
 			return GetEnumerator();
 		}
 	}
+	//ncrunch: no coverage end
 }

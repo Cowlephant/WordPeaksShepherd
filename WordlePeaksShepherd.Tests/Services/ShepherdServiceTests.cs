@@ -54,6 +54,7 @@ public sealed class ShepherdServiceTests : IClassFixture<ContainerFixture>
 		Assert.Equal(expectedWords, words);
 	}
 
+	//ncrunch: no coverage start
 	public class LetterRangesExpectedWordsWithScores : IEnumerable<object[]>
 	{
 		private readonly List<object[]> data = new List<object[]>
@@ -189,4 +190,5 @@ public sealed class ShepherdServiceTests : IClassFixture<ContainerFixture>
 			return GetEnumerator();
 		}
 	}
+	//ncrunch: no coverage end
 }
