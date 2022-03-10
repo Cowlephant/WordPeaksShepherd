@@ -1,5 +1,6 @@
 ﻿namespace WordlePeaksShepherd.Exceptions;
 
+//ncrunch: no coverage start
 public sealed class ShepherdException : Exception
 {
 	public ShepherdException(string message) : base(message)
@@ -10,3 +11,4 @@ public sealed class ShepherdException : Exception
 	{
 	}
 }
+//ncrunch: no coverage end

@@ -119,6 +119,7 @@ public sealed class LetterServiceTests
 		Assert.Equal(expectedScore, score);
 	}
 
+	//ncrunch: no coverage start
 	public class SampleWordCriteriaData : IEnumerable<object[]>
 	{
 		private readonly List<object[]> data = new List<object[]>
@@ -171,11 +172,11 @@ public sealed class LetterServiceTests
 			{
 				new WordCriteria(new List<LetterCriteria>
 				{
-					new LetterCriteria('w', LetterStatus.Outside, new LetterRange('a', 'm')),
-					new LetterCriteria('r', LetterStatus.Outside, new LetterRange('a', 'm')),
-					new LetterCriteria('o', LetterStatus.Outside, new LetterRange('a', 'm')),
-					new LetterCriteria('n', LetterStatus.Outside, new LetterRange('a', 'm')),
-					new LetterCriteria('g', LetterStatus.Outside, new LetterRange('a', 'e'))
+					new LetterCriteria('w', LetterStatus.Unknown, new LetterRange('a', 'm')),
+					new LetterCriteria('r', LetterStatus.Unknown, new LetterRange('a', 'm')),
+					new LetterCriteria('o', LetterStatus.Unknown, new LetterRange('a', 'm')),
+					new LetterCriteria('n', LetterStatus.Unknown, new LetterRange('a', 'm')),
+					new LetterCriteria('g', LetterStatus.Unknown, new LetterRange('a', 'e'))
 				}), 57
 			},
 			new object[]
@@ -185,7 +186,7 @@ public sealed class LetterServiceTests
 					new LetterCriteria('w', LetterStatus.Higher, new LetterRange('g', 'z')),
 					new LetterCriteria('e', LetterStatus.Lower, new LetterRange('a', 'm')),
 					new LetterCriteria('i', LetterStatus.Correct, new LetterRange('f', 's')),
-					new LetterCriteria('r', LetterStatus.Outside, new LetterRange('a', 'm')),
+					new LetterCriteria('r', LetterStatus.Unknown, new LetterRange('a', 'm')),
 					new LetterCriteria('d', LetterStatus.Higher, new LetterRange('a', 'z'))
 				}), 56
 			}
@@ -201,4 +202,5 @@ public sealed class LetterServiceTests
 			return GetEnumerator();
 		}
 	}
+	//ncrunch: no coverage end
 }

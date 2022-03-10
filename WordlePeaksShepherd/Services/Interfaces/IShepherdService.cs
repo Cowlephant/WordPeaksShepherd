@@ -5,9 +5,12 @@ public interface IShepherdService
 	public IEnumerable<WordCriteria> ChosenWords { get; }
 	public LetterRanges LetterRanges { get; }
 
-	public void UndoLastWordChoice();
-	public void Reset();
 	public void AddWordChoice(WordCriteria wordCriteria);
+	public void UndoWordChoice();
+	public void Reset();
 
-	public IEnumerable<string> GetSuggestedWords();
+	public IEnumerable<Word> GetSuggestedWords();
+
+	public WordCriteria GetWordCriteriaForKnownAnswer(
+		string answerWord, string chosenWord, LetterRanges currentLetterRanges);
 }
