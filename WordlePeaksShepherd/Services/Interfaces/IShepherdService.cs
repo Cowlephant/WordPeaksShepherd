@@ -10,4 +10,7 @@ public interface IShepherdService
 	public void Reset();
 
 	public IEnumerable<Word> GetSuggestedWords();
+
+	public WordCriteria GetWordCriteriaForKnownAnswer(
+		string answerWord, string chosenWord, LetterRanges currentLetterRanges);
 }

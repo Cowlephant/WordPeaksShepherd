@@ -52,28 +52,28 @@ public sealed class ShepherdServiceTests : IClassFixture<ContainerFixture>
 		var firstWordChoice = new WordCriteria(
 			new List<LetterCriteria>
 			{
-						new LetterCriteria('a', LetterStatus.Unknown, new LetterRange('a', 's')),
-						new LetterCriteria('p', LetterStatus.Unknown, new LetterRange('g', 't')),
-						new LetterCriteria('p', LetterStatus.Unknown, new LetterRange('g', 't')),
-						new LetterCriteria('l', LetterStatus.Unknown, new LetterRange('f', 'o')),
-						new LetterCriteria('e', LetterStatus.Unknown, new LetterRange('a', 'j'))
+						new LetterCriteria('a', LetterStatus.Higher, service.LetterRanges.First),
+						new LetterCriteria('p', LetterStatus.Lower, service.LetterRanges.Second),
+						new LetterCriteria('p', LetterStatus.Lower, service.LetterRanges.Third),
+						new LetterCriteria('l', LetterStatus.Lower, service.LetterRanges.Fourth),
+						new LetterCriteria('e', LetterStatus.Correct, service.LetterRanges.Fifth)
 			});
 		var secondWordChoice = new WordCriteria(
 			new List<LetterCriteria>
 			{
-						new LetterCriteria('f', LetterStatus.Unknown, new LetterRange('g', 'n')),
-						new LetterCriteria('a', LetterStatus.Unknown, new LetterRange('i', 'o')),
-						new LetterCriteria('k', LetterStatus.Unknown, new LetterRange('i', 'o')),
-						new LetterCriteria('e', LetterStatus.Unknown, new LetterRange('l', 'm')),
-						new LetterCriteria('r', LetterStatus.Unknown, new LetterRange('f', 'i'))
+						new LetterCriteria('p', LetterStatus.Lower, service.LetterRanges.First),
+						new LetterCriteria('e', LetterStatus.Higher, service.LetterRanges.Second),
+						new LetterCriteria('a', LetterStatus.Higher, service.LetterRanges.Third),
+						new LetterCriteria('c', LetterStatus.Higher, service.LetterRanges.Fourth),
+						new LetterCriteria('e', LetterStatus.Correct, service.LetterRanges.Fifth)
 			});
 		var expectedChosenWords = new List<WordCriteria> { firstWordChoice, secondWordChoice };
 		var expectedLetterRanges = new LetterRanges(
-			new LetterRange('g', 'n'),
-			new LetterRange('i', 'o'),
-			new LetterRange('i', 'o'),
-			new LetterRange('l', 'm'),
-			new LetterRange('f', 'i'));
+			new LetterRange('b', 'o'),
+			new LetterRange('f', 'o'),
+			new LetterRange('b', 'o'),
+			new LetterRange('d', 'k'),
+			new LetterRange('e', 'e'));
 
 		service.AddWordChoice(firstWordChoice);
 		service.AddWordChoice(secondWordChoice);
@@ -90,30 +90,30 @@ public sealed class ShepherdServiceTests : IClassFixture<ContainerFixture>
 		var firstWordCriteria = new WordCriteria(
 			new List<LetterCriteria>
 			{
-						new LetterCriteria('a', LetterStatus.Unknown, new LetterRange('a', 's')),
-						new LetterCriteria('p', LetterStatus.Unknown, new LetterRange('g', 't')),
-						new LetterCriteria('p', LetterStatus.Unknown, new LetterRange('g', 't')),
-						new LetterCriteria('l', LetterStatus.Unknown, new LetterRange('f', 'o')),
-						new LetterCriteria('e', LetterStatus.Unknown, new LetterRange('a', 'j'))
+						new LetterCriteria('a', LetterStatus.Higher, service.LetterRanges.First),
+						new LetterCriteria('p', LetterStatus.Lower, service.LetterRanges.Second),
+						new LetterCriteria('p', LetterStatus.Lower, service.LetterRanges.Third),
+						new LetterCriteria('l', LetterStatus.Lower, service.LetterRanges.Fourth),
+						new LetterCriteria('e', LetterStatus.Correct, service.LetterRanges.Fifth)
 			});
 		var secondWordCriteria = new WordCriteria(
 			new List<LetterCriteria>
 			{
-						new LetterCriteria('s', LetterStatus.Unknown, new LetterRange('g', 'm')),
-						new LetterCriteria('e', LetterStatus.Unknown, new LetterRange('g', 'm')),
-						new LetterCriteria('e', LetterStatus.Unknown, new LetterRange('g', 'm')),
-						new LetterCriteria('d', LetterStatus.Unknown, new LetterRange('g', 'm')),
-						new LetterCriteria('s', LetterStatus.Unknown, new LetterRange('g', 'm'))
+						new LetterCriteria('d', LetterStatus.Correct, service.LetterRanges.First),
+						new LetterCriteria('a', LetterStatus.Correct, service.LetterRanges.Second),
+						new LetterCriteria('n', LetterStatus.Correct, service.LetterRanges.Third),
+						new LetterCriteria('c', LetterStatus.Correct, service.LetterRanges.Fourth),
+						new LetterCriteria('e', LetterStatus.Correct, service.LetterRanges.Fifth)
 			});
 		service.AddWordChoice(firstWordCriteria);
 		service.AddWordChoice(secondWordCriteria);
 		var expectedChosenWords = new List<WordCriteria> { firstWordCriteria };
 		var expectedLetterRanges = new LetterRanges(
-			new LetterRange('a', 's'),
-			new LetterRange('g', 't'),
-			new LetterRange('g', 't'),
-			new LetterRange('f', 'o'),
-			new LetterRange('a', 'j'));
+			new LetterRange('b', 'z'),
+			new LetterRange('a', 'o'),
+			new LetterRange('a', 'o'),
+			new LetterRange('a', 'k'),
+			new LetterRange('e', 'e'));
 
 		// Act
 		service.UndoWordChoice();
@@ -199,9 +199,9 @@ public sealed class ShepherdServiceTests : IClassFixture<ContainerFixture>
 					new LetterRange('d', 't'),
 					new LetterRange('d', 't')),
 				new Word[] {
-					new Word("skill", 22), 
-					new Word("shirt", 56), 
-					new Word("timer", 50), 
+					new Word("skill", 22),
+					new Word("shirt", 56),
+					new Word("timer", 50),
 					new Word("hippo", 36),
 					new Word("igloo", 28),
 					new Word("slide", 50),

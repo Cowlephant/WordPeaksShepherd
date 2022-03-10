@@ -42,11 +42,16 @@ public sealed class ShepherdService : IShepherdService
 	{
 		chosenWords.Add(wordCriteria);
 
-		var firstLetterRange = NarrowLetterRange(wordCriteria.LetterCriteria[0].LetterRange, letterRanges.First);
-		var secondLetterRange = NarrowLetterRange(wordCriteria.LetterCriteria[1].LetterRange, letterRanges.Second);
-		var thirdLetterRange = NarrowLetterRange(wordCriteria.LetterCriteria[2].LetterRange, letterRanges.Third);
-		var fourthLetterRange = NarrowLetterRange(wordCriteria.LetterCriteria[3].LetterRange, letterRanges.Fourth);
-		var fifthLetterRange = NarrowLetterRange(wordCriteria.LetterCriteria[4].LetterRange, letterRanges.Fifth);
+		var firstLetterRange = NarrowLetterRange(
+			wordCriteria.LetterCriteria[0].Letter, wordCriteria.LetterCriteria[0].Status, letterRanges.First);
+		var secondLetterRange = NarrowLetterRange(
+			wordCriteria.LetterCriteria[1].Letter, wordCriteria.LetterCriteria[1].Status, letterRanges.Second);
+		var thirdLetterRange = NarrowLetterRange(
+			wordCriteria.LetterCriteria[2].Letter, wordCriteria.LetterCriteria[2].Status, letterRanges.Third);
+		var fourthLetterRange = NarrowLetterRange(
+			wordCriteria.LetterCriteria[3].Letter, wordCriteria.LetterCriteria[3].Status, letterRanges.Fourth);
+		var fifthLetterRange = NarrowLetterRange(
+			wordCriteria.LetterCriteria[4].Letter, wordCriteria.LetterCriteria[4].Status, letterRanges.Fifth);
 
 		previousLetterRanges.Add(letterRanges);
 		letterRanges = new LetterRanges(
@@ -57,12 +62,30 @@ public sealed class ShepherdService : IShepherdService
 			fifthLetterRange);
 	}
 
-	private LetterRange NarrowLetterRange(LetterRange newLetterRange, LetterRange existingLetterRange)
+	private LetterRange NarrowLetterRange(char letter, LetterStatus letterStatus, LetterRange existingLetterRange)
 	{
-		var startRange = newLetterRange.StartRange > existingLetterRange.StartRange ? 
-			newLetterRange.StartRange : existingLetterRange.StartRange;
-		var endRange = newLetterRange.EndRange < existingLetterRange.EndRange ?
-			newLetterRange.EndRange : existingLetterRange.EndRange;
+		char startRange;
+		char endRange;
+		switch (letterStatus.Name)
+		{
+			case nameof(LetterStatus.Higher):
+				startRange = letter >= existingLetterRange.StartRange ? (char)(letter + 1) : existingLetterRange.StartRange;
+				endRange = existingLetterRange.EndRange;
+				break;
+			case nameof(LetterStatus.Lower):
+				startRange = existingLetterRange.StartRange;
+				endRange = letter <= existingLetterRange.EndRange ? (char)(letter - 1) : existingLetterRange.EndRange;
+				break;
+			case nameof(LetterStatus.Correct):
+				startRange = letter;
+				endRange = letter;
+				break;
+			case nameof(LetterStatus.Unknown):
+			default:
+				startRange = existingLetterRange.StartRange;
+				endRange = existingLetterRange.EndRange;
+				break;
+		}
 
 		return new LetterRange(startRange, endRange);
 	}
@@ -79,7 +102,7 @@ public sealed class ShepherdService : IShepherdService
 		var regex = new Regex(wordPattern, RegexOptions.IgnoreCase | RegexOptions.Multiline);
 
 		var matches = regex.Matches(rawWords)
-			.Select(x => 
+			.Select(x =>
 			{
 				var letterCriteria = new List<LetterCriteria>
 				{
@@ -98,7 +121,7 @@ public sealed class ShepherdService : IShepherdService
 
 	public void UndoWordChoice()
 	{
-		if(chosenWords.Count == 0)
+		if (chosenWords.Count == 0)
 		{
 			return;
 		}
@@ -113,5 +136,57 @@ public sealed class ShepherdService : IShepherdService
 		chosenWords = new List<WordCriteria>();
 		letterRanges = LetterRanges.Default;
 		previousLetterRanges = new List<LetterRanges>();
+	}
+
+	public WordCriteria GetWordCriteriaForKnownAnswer(
+		string answerWord, string chosenWord, LetterRanges currentLetterRanges)
+	{
+		var letterRanges = new List<LetterRange>();
+		letterRanges.AddRange(new[]
+		{
+			currentLetterRanges.First,
+			currentLetterRanges.Second,
+			currentLetterRanges.Third,
+			currentLetterRanges.Fourth,
+			currentLetterRanges.Fifth
+		});
+		var narrowedLetterRanges = new List<LetterRange>();
+		var letterStatuses = new List<LetterStatus>();
+
+		for (var i = 0; i < chosenWord.Length; i++)
+		{
+			if (chosenWord[i] < answerWord[i])
+			{
+				narrowedLetterRanges.Add(NarrowLetterRange(chosenWord[i], LetterStatus.Higher, letterRanges[i]));
+				letterStatuses.Add(LetterStatus.Higher);
+			}
+			else if (chosenWord[i] > answerWord[i])
+			{
+				narrowedLetterRanges.Add(NarrowLetterRange(chosenWord[i], LetterStatus.Lower, letterRanges[i]));
+				letterStatuses.Add(LetterStatus.Lower);
+			}
+			else if (chosenWord[i] == answerWord[i])
+			{
+				narrowedLetterRanges.Add(NarrowLetterRange(chosenWord[i], LetterStatus.Correct, letterRanges[i]));
+				letterStatuses.Add(LetterStatus.Correct);
+			}
+			else
+			{
+				narrowedLetterRanges.Add(NarrowLetterRange(chosenWord[i], LetterStatus.Unknown, letterRanges[i]));
+				letterStatuses.Add(LetterStatus.Unknown);
+			}
+		}
+
+		var letterCriteria = new List<LetterCriteria>
+			{
+				new LetterCriteria(chosenWord[0], letterStatuses[0], narrowedLetterRanges[0]),
+				new LetterCriteria(chosenWord[1], letterStatuses[1], narrowedLetterRanges[1]),
+				new LetterCriteria(chosenWord[2], letterStatuses[2], narrowedLetterRanges[2]),
+				new LetterCriteria(chosenWord[3], letterStatuses[3], narrowedLetterRanges[3]),
+				new LetterCriteria(chosenWord[4], letterStatuses[4], narrowedLetterRanges[4])
+			};
+		var wordCriteria = new WordCriteria(letterCriteria);
+
+		return wordCriteria;
 	}
 }
