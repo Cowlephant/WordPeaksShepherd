@@ -1,6 +1,6 @@
 ﻿namespace WordlePeaksShepherd.Services;
 
-public class LetterRanges
+public class LetterRanges : ValueObject
 {
 	public LetterRange First { get; init; }
 	public LetterRange Second { get; init; }

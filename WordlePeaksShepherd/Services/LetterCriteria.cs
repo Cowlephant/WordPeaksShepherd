@@ -6,9 +6,8 @@ public sealed class LetterCriteria : ValueObject
 {
 	public char Letter { get; init; }
 	public LetterStatus Status { get; private set; }
-
-	[IgnoreMember]
 	public LetterRange LetterRange { get; private set; }
+
 	[IgnoreMember]
 	public bool IsCorrect { get; private set; }
 
