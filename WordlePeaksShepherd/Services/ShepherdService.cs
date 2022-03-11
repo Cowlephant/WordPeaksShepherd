@@ -153,6 +153,7 @@ public sealed class ShepherdService : IShepherdService
 		var narrowedLetterRanges = new List<LetterRange>();
 		var letterStatuses = new List<LetterStatus>();
 
+		// Iterate through each character and set LetterStatus and associated values to build LetterCriteria after
 		for (var i = 0; i < chosenWord.Length; i++)
 		{
 			if (chosenWord[i] < answerWord[i])

@@ -159,6 +159,38 @@ public sealed class ShepherdServiceTests : IClassFixture<ContainerFixture>
 		Assert.Equal(expectedLetterRanges, service.LetterRanges);
 	}
 
+	// Super sloppy, may have a reason to clean this up at some point
+	[Theory]
+	[InlineData("apple", "knoll", "Lower", "Higher", "Higher", "Correct", "Lower", "aj", "oz", "pz", "ll", "ak")]
+	[InlineData("trash", "piggy", "Higher", "Higher", "Lower", "Higher", "Lower", "qz", "jz", "af", "hz", "ax")]
+	[InlineData("pears", "gooey", "Higher", "Lower", "Lower", "Higher", "Lower", "hz", "an", "an", "fz", "ax")]
+	public void GetWordCriteriaForKnownAnswer_ShouldReturnExpectedWordCriteriaGivenValues(
+		string answerWord, string chosenWord, 
+		string firstStatus, string secondStatus, string thirdStatus, string fourthStatus, string fifthStatus,
+		string firstRange, string secondRange, string thirdRange, string fourthRange, string fifthRange)
+	{
+		var service = new ShepherdService(LetterRanges.Default, wordService, letterService);
+		var expectedLetterCriteria = new List<LetterCriteria>
+			{
+				new LetterCriteria(
+					chosenWord[0], LetterStatus.FromName(firstStatus), new LetterRange(firstRange[0], firstRange[1])),
+				new LetterCriteria(
+					chosenWord[1], LetterStatus.FromName(secondStatus), new LetterRange(secondRange[0], secondRange[1])),
+				new LetterCriteria(
+					chosenWord[2], LetterStatus.FromName(thirdStatus), new LetterRange(thirdRange[0], thirdRange[1])),
+				new LetterCriteria(
+					chosenWord[3], LetterStatus.FromName(fourthStatus), new LetterRange(fourthRange[0], fourthRange[1])),
+				new LetterCriteria(
+					chosenWord[4], LetterStatus.FromName(fifthStatus), new LetterRange(fifthRange[0], fifthRange[1])),
+			};
+		var expectedWordCriteria = new WordCriteria(expectedLetterCriteria);
+
+		var wordCriteria = service.GetWordCriteriaForKnownAnswer(answerWord, chosenWord, service.LetterRanges);
+
+		wordCriteria.Should().BeEquivalentTo(expectedWordCriteria, options => options.ComparingByMembers<WordCriteria>());
+	}
+
+
 	[Theory, ClassData(typeof(LetterRangesExpectedWordsWithScores))]
 	public void GetSuggestedWords_ShouldReturnExpectedWordsWithScoresGivenLetterRanges(
 		LetterRanges letterRanges, IEnumerable<Word> expectedWords)
